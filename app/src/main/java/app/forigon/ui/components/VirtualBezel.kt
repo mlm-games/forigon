@@ -6,74 +6,83 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan2
+import kotlin.math.min
 import kotlin.math.sqrt
 
 /**
- * Detects circular motion along the edge of the screen (like Samsung rotating bezel).
- * Only activates when touch is near the screen edge.
+ * Detent-based "virtual bezel" (touch rotary) for one-finger watches.
  *
- * @param edgeThresholdFraction How close to edge to activate (0.15 = outer 15% of radius)
- * @param onRotated Callback with rotation delta (positive = clockwise, negative = counter-clockwise)
+ * - Requires gesture start near the edge ring.
+ * - Once captured, allows drifting inward until stickyInnerFraction.
+ * - Emits discrete step "detents" rather than continuous deltas.
  */
-fun Modifier.virtualRotaryInput(
-    edgeThresholdFraction: Float = 0.20f,
-    onRotated: (Float) -> Unit
-): Modifier = this.pointerInput(Unit) {
-    val centerX = size.width / 2f
-    val centerY = size.height / 2f
-    val maxRadius = minOf(centerX, centerY)
-    val minEdgeRadius = maxRadius * (1f - edgeThresholdFraction)
+fun Modifier.virtualRotaryDetents(
+    enabled: Boolean = true,
+    edgeThresholdFraction: Float = 0.30f,
+    detentDegrees: Float = 15f,
+    stickyInnerFraction: Float = 0.60f,
+    onActiveChanged: (Boolean) -> Unit = {},
+    onDetents: (steps: Int) -> Unit
+): Modifier = if (!enabled) this else this.pointerInput(edgeThresholdFraction, detentDegrees, stickyInnerFraction) {
+
+    fun angleWrapDiff(cur: Float, prev: Float): Float {
+        var d = cur - prev
+        val pi = Math.PI.toFloat()
+        if (d > pi) d -= (2f * pi)
+        if (d < -pi) d += (2f * pi)
+        return d
+    }
 
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false)
 
-        // Check if touch started near edge
-        val downVec = down.position - Offset(centerX, centerY)
-        val downRadius = sqrt(downVec.x * downVec.x + downVec.y * downVec.y)
+        val center = Offset(size.width / 2f, size.height / 2f)
+        val maxRadius = minOf(center.x, center.y)
+        val activationRadius = maxRadius * (1f - edgeThresholdFraction)
+        val stickyRadius = maxRadius * stickyInnerFraction
 
-        // Only handle if touch is in the edge zone
-        if (downRadius < minEdgeRadius) {
-            return@awaitEachGesture // Not on edge, let other handlers deal with it
-        }
+        val downVec = down.position - center
+        val downR = sqrt(downVec.x * downVec.x + downVec.y * downVec.y)
 
-        var previousAngle = atan2(downVec.y, downVec.x)
-        var isBezelGesture = true
+        // Must start near edge
+        if (downR < activationRadius) return@awaitEachGesture
 
-        while (isBezelGesture) {
-            val event = awaitPointerEvent()
-            val change = event.changes.firstOrNull() ?: break
+        onActiveChanged(true)
+        try {
+            var prevAngle = atan2(downVec.y, downVec.x)
+            var accum = 0f
+            val detentRad = Math.toRadians(detentDegrees.toDouble()).toFloat()
 
-            if (!change.pressed) break
+            while (true) {
+                val event = awaitPointerEvent()
+                val change = event.changes.firstOrNull() ?: break
+                if (!change.pressed) break
 
-            val position = change.position
-            val vec = position - Offset(centerX, centerY)
-            val radius = sqrt(vec.x * vec.x + vec.y * vec.y)
+                val vec = change.position - center
+                val r = sqrt(vec.x * vec.x + vec.y * vec.y)
 
-            // If finger moved too far from edge, stop bezel gesture
-            if (radius < minEdgeRadius * 0.8f) {
-                isBezelGesture = false
-                break
+                // Allow drift inward, but bail if too far inside
+                if (r < stickyRadius) break
+
+                val curAngle = atan2(vec.y, vec.x)
+                accum += angleWrapDiff(curAngle, prevAngle)
+                prevAngle = curAngle
+
+                var steps = 0
+                while (accum >= detentRad) { steps += 1; accum -= detentRad }
+                while (accum <= -detentRad) { steps -= 1; accum += detentRad }
+
+                if (steps != 0) {
+                    // Negate so clockwise feels like "down"
+                    onDetents(-steps)
+                    change.consume()
+                }
             }
-
-            val currentAngle = atan2(vec.y, vec.x)
-            var angleDiff = currentAngle - previousAngle
-
-            // Handle wrap-around at PI/-PI boundary
-            if (angleDiff > Math.PI) {
-                angleDiff -= (2 * Math.PI).toFloat()
-            } else if (angleDiff < -Math.PI) {
-                angleDiff += (2 * Math.PI).toFloat()
-            }
-
-            // Only process if there's meaningful rotation
-            if (kotlin.math.abs(angleDiff) > 0.01f) {
-                // Convert radians to a scroll-friendly value
-                // Positive angleDiff = counter-clockwise, so negate for intuitive scroll
-                onRotated(-angleDiff * 150f)
-                previousAngle = currentAngle
-                change.consume()
-            }
+        } finally {
+            onActiveChanged(false)
         }
     }
 }

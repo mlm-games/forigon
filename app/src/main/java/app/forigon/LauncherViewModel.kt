@@ -8,13 +8,7 @@ import app.forigon.data.HomeItem
 import app.forigon.data.HomeLayout
 import app.forigon.data.repository.AppRepository
 import app.forigon.helper.SearchAliasUtils
-import app.forigon.settings.AppDrawerStyle
-import app.forigon.settings.LauncherSettings
-import app.forigon.settings.LauncherState
-import app.forigon.settings.SearchType
-import app.forigon.settings.SortOrder
-import app.forigon.settings.ThemeMode
-import app.forigon.settings.markLaunched
+import app.forigon.settings.*
 import io.github.mlmgames.settings.core.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -29,11 +23,8 @@ class LauncherViewModel(
     app: Application,
     private val settingsRepo: SettingsRepository<LauncherSettings>,
     private val stateRepo: SettingsRepository<LauncherState>,
+    private val appRepository: AppRepository,
 ) : AndroidViewModel(app) {
-
-    private val context = app.applicationContext
-
-    private val appRepository = AppRepository(context, settingsRepo, stateRepo, viewModelScope)
 
     private val _ui = MutableStateFlow(LauncherUiState())
     val ui: StateFlow<LauncherUiState> = _ui.asStateFlow()
@@ -201,45 +192,91 @@ class LauncherViewModel(
         return pi == p.length
     }
 
-    fun updateTheme(mode: ThemeMode) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(theme = mode) }
-        }
+    fun updateTheme(mode: ThemeMode) = viewModelScope.launch {
+        settingsRepo.update { it.copy(theme = mode) }
     }
 
-    fun updateShowAppIcons(show: Boolean) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(showAppIcons = show) }
-        }
+    fun updateShowAppIcons(show: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(showAppIcons = show) }
     }
 
-    fun updateSortOrder(order: SortOrder) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(sortOrder = order) }
-        }
+    fun updateSortOrder(order: SortOrder) = viewModelScope.launch {
+        settingsRepo.update { it.copy(sortOrder = order) }
     }
 
-    fun updateSearchType(type: SearchType) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(searchType = type) }
-        }
+    fun updateSearchType(type: SearchType) = viewModelScope.launch {
+        settingsRepo.update { it.copy(searchType = type) }
     }
 
-    fun updateSearchIncludePackageNames(include: Boolean) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(searchIncludePackageNames = include) }
-        }
+    fun updateSearchIncludePackageNames(include: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(searchIncludePackageNames = include) }
     }
 
-    fun updateShowHiddenAppsOnSearch(show: Boolean) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(showHiddenAppsOnSearch = show) }
-        }
+    fun updateShowHiddenAppsOnSearch(show: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(showHiddenAppsOnSearch = show) }
     }
 
-    fun updateAppDrawerStyle(style: AppDrawerStyle) {
-        viewModelScope.launch {
-            settingsRepo.update { it.copy(appDrawerStyle = style) }
-        }
+    fun updateAppDrawerStyle(style: AppDrawerStyle) = viewModelScope.launch {
+        settingsRepo.update { it.copy(appDrawerStyle = style) }
     }
+
+    fun updateUiScale(scale: Float) = viewModelScope.launch {
+        settingsRepo.update { it.copy(uiScale = scale.coerceIn(0.75f, 2.0f)) }
+    }
+
+    fun updateTouchTargetBoost(enabled: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(touchTargetBoost = enabled) }
+    }
+
+    fun updateMotionMode(mode: MotionMode) = viewModelScope.launch {
+        settingsRepo.update { it.copy(motionMode = mode) }
+    }
+
+    fun updateAnimationSpeed(multiplier: Float) = viewModelScope.launch {
+        settingsRepo.update { it.copy(animationSpeed = multiplier.coerceIn(0.5f, 2.0f)) }
+    }
+
+    fun updateAppOptionsGesture(gesture: AppOptionsGesture) = viewModelScope.launch {
+        settingsRepo.update { it.copy(appOptionsGesture = gesture) }
+    }
+
+    fun updateVirtualBezelEnabled(enabled: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(enableVirtualBezel = enabled) }
+    }
+
+    fun updateBezelInvertDirection(invert: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelInvertDirection = invert) }
+    }
+
+    fun updateBezelHaptics(enabled: Boolean) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelHaptics = enabled) }
+    }
+
+    fun updateBezelEdgeThresholdFraction(f: Float) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelEdgeThresholdFraction = f.coerceIn(0.10f, 0.60f)) }
+    }
+
+    fun updateBezelStickyInnerFraction(f: Float) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelStickyInnerFraction = f.coerceIn(0.30f, 0.95f)) }
+    }
+
+    fun updateBezelDetentDegrees(deg: Float) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelDetentDegrees = deg.coerceIn(5f, 45f)) }
+    }
+
+    fun updateBezelScrollMode(mode: BezelScrollMode) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelScrollMode = mode) }
+    }
+
+    fun updateBezelScrollPixelsPerDetent(px: Float) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelScrollPixelsPerDetent = px.coerceIn(5f, 200f)) }
+    }
+
+    fun updateBezelScrollItemsPerDetent(items: Int) = viewModelScope.launch {
+        settingsRepo.update { it.copy(bezelScrollItemsPerDetent = items.coerceIn(1, 10)) }
+    }
+    fun updateBezelSound(enabled: Boolean) {
+        viewModelScope.launch { settingsRepo.update { it.copy(bezelSound = enabled) } }
+    }
+
 }

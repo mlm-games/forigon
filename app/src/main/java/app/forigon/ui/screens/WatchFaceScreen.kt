@@ -8,7 +8,8 @@ import android.os.BatteryManager
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BatteryStd
@@ -16,14 +17,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.forigon.ui.components.detectSwipeGestures
 import app.forigon.ui.theme.LauncherColors
+import app.forigon.ui.theme.LocalLauncherMotion
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,13 +40,14 @@ import kotlin.math.sin
 @Composable
 fun WatchFaceScreen(
     onAppDrawerClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
 ) {
-    var time by remember { mutableStateOf(System.currentTimeMillis()) }
+    var time by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var batteryLevel by remember { mutableIntStateOf(100) }
     val context = LocalContext.current
+    val motion = LocalLauncherMotion.current
+    val focusRequester = remember { FocusRequester() }
 
-    // Update time
     LaunchedEffect(Unit) {
         while (true) {
             time = System.currentTimeMillis()
@@ -47,7 +55,11 @@ fun WatchFaceScreen(
         }
     }
 
-    // Battery Monitor
+    // Request focus for d-pad navigation
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     DisposableEffect(context) {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(c: Context?, intent: Intent?) {
@@ -69,40 +81,74 @@ fun WatchFaceScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .clickable(onClick = onAppDrawerClick), // Tap anywhere to open apps (or make specific button)
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { event ->
+                if (event.type == KeyEventType.KeyDown) {
+                    when (event.key) {
+                        Key.DirectionUp -> {
+                            onSettingsClick()
+                            true
+                        }
+                        Key.DirectionDown -> {
+                            onAppDrawerClick()
+                            true
+                        }
+                        Key.DirectionCenter, Key.Enter -> {
+//                            onAppDrawerClick()
+                            true
+                        }
+                        else -> false
+                    }
+                } else false
+            }
+            .detectSwipeGestures(
+                onSwipeUp = onAppDrawerClick,
+                onSwipeDown = onSettingsClick
+            ),
+//            .pointerInput(Unit) {
+//                detectTapGestures(
+//                    onTap = { onAppDrawerClick() },
+//                    onLongPress = { onSettingsClick() }
+//                )
+//            },
         contentAlignment = Alignment.Center
     ) {
-        // Analog Seconds Indicator (Outer Ring)
-        val infiniteTransition = rememberInfiniteTransition(label = "seconds")
-        val angle by infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(60000, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "seconds_angle"
-        )
-        
+        // Seconds ring only if motion allows infinite effects
+        val angle = if (motion.enableInfiniteEffects) {
+            val infiniteTransition = rememberInfiniteTransition(label = "seconds")
+            infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(60000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "seconds_angle"
+            ).value
+        } else {
+            0f
+        }
+
         Canvas(modifier = Modifier.fillMaxSize().padding(4.dp)) {
             drawCircle(
                 color = LauncherColors.DarkSurfaceVariant,
                 style = Stroke(width = 4.dp.toPx())
             )
-            // Seconds dot
-            val rad = Math.toRadians(angle.toDouble() - 90)
-            val r = size.minDimension / 2
-            drawCircle(
-                color = LauncherColors.AccentBlue,
-                radius = 6.dp.toPx(),
-                center = center + Offset(
-                    (r * cos(rad)).toFloat(),
-                    (r * sin(rad)).toFloat()
+            if (motion.enableInfiniteEffects) {
+                val rad = Math.toRadians(angle.toDouble() - 90)
+                val r = size.minDimension / 2
+                drawCircle(
+                    color = LauncherColors.AccentBlue,
+                    radius = 6.dp.toPx(),
+                    center = center + Offset(
+                        (r * cos(rad)).toFloat(),
+                        (r * sin(rad)).toFloat()
+                    )
                 )
-            )
+            }
         }
 
-        // Digital Time & Date
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = timeFormat.format(Date(time)),
@@ -119,8 +165,7 @@ fun WatchFaceScreen(
                 color = LauncherColors.AccentBlue
             )
             Spacer(modifier = Modifier.height(8.dp))
-            
-            // Battery Pill
+
             Surface(
                 color = LauncherColors.DarkSurfaceVariant,
                 shape = MaterialTheme.shapes.extraLarge
@@ -132,7 +177,7 @@ fun WatchFaceScreen(
                     Icon(
                         imageVector = Icons.Rounded.BatteryStd,
                         contentDescription = null,
-                        tint = if(batteryLevel < 20) LauncherColors.Error else LauncherColors.Success,
+                        tint = if (batteryLevel < 20) LauncherColors.Error else LauncherColors.Success,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(Modifier.width(4.dp))
