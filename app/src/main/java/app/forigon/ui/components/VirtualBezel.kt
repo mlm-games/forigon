@@ -5,29 +5,32 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
-import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.atan2
-import kotlin.math.min
 import kotlin.math.sqrt
 
 /**
- * Detent-based "virtual bezel" (touch rotary) for one-finger watches.
+ * Virtual rotary bezel detector.
+ * Tracks circular gestures starting near screen edge and fires detent callbacks.
  *
- * - Requires gesture start near the edge ring.
- * - Once captured, allows drifting inward until stickyInnerFraction.
- * - Emits discrete step "detents" rather than continuous deltas.
+ * @param enabled Whether the detector is active
+ * @param edgeThresholdFraction Outer ring thickness as fraction of radius (0.30 = outer 30%)
+ * @param stickyInnerFraction How far finger can drift inward before releasing (0.60 = 60% of radius)
+ * @param detentDegrees Degrees per "click" / detent
+ * @param onActiveChanged Called when bezel capture state changes (true = captured, false = released)
+ * @param onDetent Called with step count per detent (-1 or +1 per step, batched)
  */
 fun Modifier.virtualRotaryDetents(
     enabled: Boolean = true,
     edgeThresholdFraction: Float = 0.30f,
-    detentDegrees: Float = 15f,
     stickyInnerFraction: Float = 0.60f,
+    detentDegrees: Float = 15f,
     onActiveChanged: (Boolean) -> Unit = {},
-    onDetents: (steps: Int) -> Unit
-): Modifier = if (!enabled) this else this.pointerInput(edgeThresholdFraction, detentDegrees, stickyInnerFraction) {
-
+    onDetent: (steps: Int) -> Unit
+): Modifier = if (!enabled) this else this.pointerInput(
+    edgeThresholdFraction,
+    stickyInnerFraction,
+    detentDegrees
+) {
     fun angleWrapDiff(cur: Float, prev: Float): Float {
         var d = cur - prev
         val pi = Math.PI.toFloat()
@@ -64,7 +67,7 @@ fun Modifier.virtualRotaryDetents(
                 val vec = change.position - center
                 val r = sqrt(vec.x * vec.x + vec.y * vec.y)
 
-                // Allow drift inward, but bail if too far inside
+                // Sticky: allow drift inward, but bail if too far inside
                 if (r < stickyRadius) break
 
                 val curAngle = atan2(vec.y, vec.x)
@@ -77,7 +80,7 @@ fun Modifier.virtualRotaryDetents(
 
                 if (steps != 0) {
                     // Negate so clockwise feels like "down"
-                    onDetents(-steps)
+                    onDetent(-steps)
                     change.consume()
                 }
             }
