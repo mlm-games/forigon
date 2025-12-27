@@ -1,23 +1,22 @@
-Forigon is a open-source launcher for Android TV devices. It tries to provide a clean, and fast home screen experience without any big-banner advertisements optimized for remote control navigation.
+Launcher for Wear OS and full Android smartwatches.
 
-<b>Features:</b>
+Features:
 
-• <b>TV-First Design</b> - For 10-foot UI with D-pad navigation and focus handling
-• <b>App Organization</b> - Favorites and Hidden apps
-• <b>Quick Access Sidebar</b> - Expandable sidebar with clock
-• <b>Recent Apps</b> - Quickly access your most recently used apps
+- List or bubble cloud app drawer
+- Virtual rotary bezel - scroll by dragging screen edge
+- Quick settings panel for supported devices (flashlight, DND, WiFi, Bluetooth)
+- App search with fuzzy matching
+- Hide apps from drawer
+- Adjustable UI scale for small screens
+- Reduced motion mode for battery saving
 
-<b>Privacy Focused:</b>
+Controls:
 
-• No ads or tracking
-• No internet permission required
-• No data collection
-• Fully open source
+- Tap watch face → open apps
+- Long-press watch face → settings
+- Swipe up → apps
+- Swipe down → quick settings
+- Drag along screen edge → scroll or zoom
 
-<b>Requirements:</b>
-
-• Android TV or device with Leanback support
-• Android 7.0 (API 24) or higher
-
-Forigon aims to be a dizziness causing alternative to stock Android TV launchers, while removing bloat or sponsored content.
-If you would prefer a simpler looking launcher, would recommend LeanBackOnFire instead.
+Supports round and square displays. Should also work with physical rotary bezels and crowns.
+No plans of having watch faces or other external apis support for near future due to other tasks.

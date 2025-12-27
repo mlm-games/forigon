@@ -38,6 +38,21 @@ object SettingsShortcuts {
         context.startFirstResolvable(intents)
     }
 
+    fun openDisplay(context: Context) {
+        val intents = listOf(Intent(Settings.ACTION_DISPLAY_SETTINGS))
+        context.startFirstResolvable(intents)
+    }
+
+    fun openSound(context: Context) {
+        val intents = listOf(Intent(Settings.ACTION_SOUND_SETTINGS))
+        context.startFirstResolvable(intents)
+    }
+
+    fun openNotificationAccess(context: Context) {
+        val intents = listOf(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+        context.startFirstResolvable(intents)
+    }
+
     private fun Context.startFirstResolvable(intents: List<Intent>) {
         val pm = packageManager
         for (i in intents) {
