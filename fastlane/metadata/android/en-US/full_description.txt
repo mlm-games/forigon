@@ -1,0 +1,23 @@
+Forigon is a open-source launcher for Android TV devices. It tries to provide a clean, and fast home screen experience without any big-banner advertisements optimized for remote control navigation.
+
+<b>Features:</b>
+
+• <b>TV-First Design</b> - For 10-foot UI with D-pad navigation and focus handling
+• <b>App Organization</b> - Favorites and Hidden apps
+• <b>Quick Access Sidebar</b> - Expandable sidebar with clock
+• <b>Recent Apps</b> - Quickly access your most recently used apps
+
+<b>Privacy Focused:</b>
+
+• No ads or tracking
+• No internet permission required
+• No data collection
+• Fully open source
+
+<b>Requirements:</b>
+
+• Android TV or device with Leanback support
+• Android 7.0 (API 24) or higher
+
+Forigon aims to be a dizziness causing alternative to stock Android TV launchers, while removing bloat or sponsored content.
+If you would prefer a simpler looking launcher, would recommend LeanBackOnFire instead.

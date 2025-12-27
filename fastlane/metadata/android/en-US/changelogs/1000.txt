@@ -1,0 +1,5 @@
+- Refactor Android release workflow configuration
+- Show banners by default
+- Wire most settings
+- rename to forigon
+- Usable
