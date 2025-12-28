@@ -28,8 +28,8 @@ android {
         applicationId = "app.forigon"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1030
-        versionName = "v1.1.0"
+        versionCode = 1040
+        versionName = "v1.1.1"
 
         androidResources {
             localeFilters += setOf("en", "ar", "de", "es-rES", "es-rUS", "fr", "hr", "hu", "in", "it", "ja", "pl", "pt-rBR", "ru-rRU", "sv", "tr", "uk", "zh")
