@@ -3,7 +3,6 @@ package app.forigon.ui.screens
 import android.view.SoundEffectConstants
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.DisableSelection
@@ -13,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
@@ -71,14 +69,11 @@ fun WatchAppDrawer(
                 val s = if (invert) -steps else steps
 
                 if (isBubbleMode) {
-                    // In bubble mode, rotary controls zoom
                     pendingZoomDetents += s
                 } else {
-                    // In list mode, rotary controls scroll
                     pendingScrollDetents += s
                 }
 
-                // Per-step feedback (not per-batch)
                 val n = abs(steps)
                 repeat(n) {
                     if (settings.bezelHaptics) {
@@ -99,25 +94,23 @@ fun WatchAppDrawer(
 
             isBubbleMode -> {
                 BubbleCloudLayout(
+                    items = apps,
                     modifier = Modifier.fillMaxSize(),
                     itemSizeDp = 70,
                     externalZoomDelta = pendingZoomDetents,
-                    onZoomDeltaConsumed = { pendingZoomDetents = 0 }
-                ) {
-                    apps.forEach { app ->
-                        WatchBubbleItem(
-                            app = app,
-                            optionsGesture = settings.appOptionsGesture,
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                viewModel.launch(app)
-                            },
-                            onLongClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                selectedApp = app
-                            }
-                        )
-                    }
+                    onZoomDeltaConsumed = { pendingZoomDetents = 0 },
+                    key = { it.appPackage },
+                    onItemClick = { app ->
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        viewModel.launch(app)
+                    },
+                    onItemLongClick = { app ->
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        selectedApp = app
+                    },
+                    useDoubleTapForOptions = settings.appOptionsGesture == AppOptionsGesture.DoubleTap
+                ) { app ->
+                    WatchBubbleItemContent(app = app)
                 }
             }
 
@@ -142,7 +135,6 @@ fun WatchAppDrawer(
             }
         }
 
-        // Ring indicator overlay (on top of everything in this Box)
         BezelCapturedRingIndicator(
             active = bezelActive,
             modifier = Modifier.fillMaxSize()
@@ -161,38 +153,15 @@ fun WatchAppDrawer(
     }
 }
 
+/**
+ * Content-only composable for bubble items (no gesture handling - that's done by the layout)
+ */
 @Composable
-private fun WatchBubbleItem(
-    app: AppModel,
-    optionsGesture: AppOptionsGesture,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit
-) {
-    val clickMod = when (optionsGesture) {
-        AppOptionsGesture.LongPress -> {
-            Modifier.pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { onClick() },
-                    onLongPress = { onLongClick() }
-                )
-            }
-        }
-        AppOptionsGesture.DoubleTap -> {
-            Modifier.pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { onClick() },
-                    onDoubleTap = { onLongClick() }
-                )
-            }
-        }
-    }
-
+private fun BoxScope.WatchBubbleItemContent(app: AppModel) {
     DisableSelection {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .size(WatchSizes.bubbleSize + 14.dp)
-                .then(clickMod)
+            modifier = Modifier.matchParentSize()
         ) {
             Box(
                 modifier = Modifier
