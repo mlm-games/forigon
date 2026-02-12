@@ -31,7 +31,7 @@ env:
   APP_SLUG: 'forigon'     
   APPLICATION_ID: 'app.forigon'
 
-  JAVA_VERSION: '17'
+  JAVA_VERSION: '21'
   JAVA_DISTRIBUTION: 'corretto'
   BUILD_GRADLE_PATH: 'app/build.gradle.kts'
 
