@@ -1,3 +1,8 @@
+## vv1.1.3
+
+- bump to agp 9, jvm to 21
+
+
 ## vv1.1.2
 
 - Rename build step for clarity in release workflow
