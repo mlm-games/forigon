@@ -133,4 +133,6 @@
     <string name="alignment_changed">Вирівнювання змінено ✅</string>
     <string name="home_screen">Головний екран</string>
     <string name="use_system_font">Використовувати системний шрифт</string>
+    <string name="system_font">Системний шрифт</string>
+    <string name="use_plain_wallpaper">Використовувати звичайні шпалери</string>
 </resources>

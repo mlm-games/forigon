@@ -128,4 +128,6 @@
     <string name="alignment_changed">تم تغيير المحاذاة ✅</string>
     <string name="home_screen">شاشة الرئيسية</string>
     <string name="use_system_font">استخدم خط النظام</string>
+    <string name="system_font">خط النظام</string>
+    <string name="use_plain_wallpaper">استخدام خلفية عادية</string>
 </resources>

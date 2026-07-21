@@ -134,4 +134,6 @@
     <string name="alignment_changed">Az igazítás megváltozott ✅</string>
     <string name="home_screen">Kezdőképernyő</string>
     <string name="use_system_font">Rendszerbetűtípus használata</string>
+    <string name="system_font">Rendszerbetűtípus</string>
+    <string name="use_plain_wallpaper">Egyszerű háttérkép használata</string>
 </resources>

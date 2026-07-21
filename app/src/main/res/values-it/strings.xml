@@ -132,4 +132,6 @@
     <string name="alignment_changed">Allineamento cambiato ✅</string>
     <string name="home_screen">Schermata principale</string>
     <string name="use_system_font">Usa carattere di sistema</string>
+    <string name="system_font">Carattere di sistema</string>
+    <string name="use_plain_wallpaper">Usa sfondo semplice</string>
 </resources>

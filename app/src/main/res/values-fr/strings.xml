@@ -131,4 +131,6 @@
     <string name="alignment_changed">Alignement changé ✅</string>
     <string name="home_screen">Écran d\'accueil</string>
     <string name="use_system_font">Utiliser la police système</string>
+    <string name="system_font">Police système</string>
+    <string name="use_plain_wallpaper">Utiliser un fond d\'écran uni</string>
 </resources>

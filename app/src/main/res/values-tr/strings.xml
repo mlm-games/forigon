@@ -133,4 +133,6 @@
     <string name="alignment_changed">Hizalama değiştirildi ✅</string>
     <string name="home_screen">Ana ekran</string>
     <string name="use_system_font">Sistem yazı tipini kullan</string>
+    <string name="system_font">Sistem yazı tipi</string>
+    <string name="use_plain_wallpaper">Düz duvar kağıdı kullan</string>
 </resources>

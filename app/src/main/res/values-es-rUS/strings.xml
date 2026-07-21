@@ -130,4 +130,6 @@
     <string name="alignment_changed">Alineación cambiada ✅</string>
     <string name="home_screen">Pantalla de inicio</string>
     <string name="use_system_font">Usar fuente del sistema</string>
+    <string name="system_font">Fuente del sistema</string>
+    <string name="use_plain_wallpaper">Usar fondo de pantalla liso</string>
 </resources>

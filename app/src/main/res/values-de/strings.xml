@@ -133,4 +133,6 @@
     <string name="alignment_changed">Ausrichtung geändert ✅</string>
     <string name="home_screen">Startbildschirm</string>
     <string name="use_system_font">Systemschriftart verwenden</string>
+    <string name="system_font">Systemschriftart</string>
+    <string name="use_plain_wallpaper">Normales Hintergrundbild verwenden</string>
 </resources>

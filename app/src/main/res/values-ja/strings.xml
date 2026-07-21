@@ -132,4 +132,6 @@
     <string name="alignment_changed">アライメントが変更されました ✅</string>
     <string name="home_screen">ホーム画面</string>
     <string name="use_system_font">システムフォントを使用</string>
+    <string name="system_font">システムフォント</string>
+    <string name="use_plain_wallpaper">無地の壁紙を使用</string>
 </resources>

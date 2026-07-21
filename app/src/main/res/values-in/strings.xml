@@ -130,4 +130,6 @@
     <string name="alignment_changed">Penyelarasan diubah ✅</string>
     <string name="home_screen">Layar beranda</string>
     <string name="use_system_font">Gunakan font sistem</string>
+    <string name="system_font">Font sistem</string>
+    <string name="use_plain_wallpaper">Gunakan wallpaper polos</string>
 </resources>

@@ -133,4 +133,6 @@
     <string name="alignment_changed">Выравнивание изменено ✅</string>
     <string name="home_screen">Главный экран</string>
     <string name="use_system_font">Использовать системный шрифт</string>
+    <string name="system_font">Системный шрифт</string>
+    <string name="use_plain_wallpaper">Использовать обычные обои</string>
 </resources>

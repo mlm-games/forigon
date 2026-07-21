@@ -131,4 +131,6 @@
     <string name="alignment_changed">Justering ändrad ✅</string>
     <string name="home_screen">Startskärm</string>
     <string name="use_system_font">Använd systemteckensnitt</string>
+    <string name="system_font">Systemteckensnitt</string>
+    <string name="use_plain_wallpaper">Använd enfärgad bakgrund</string>
 </resources>

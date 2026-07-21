@@ -133,4 +133,6 @@
     <string name="alignment_changed">Poravnanje promijenjeno ✅</string>
     <string name="home_screen">Početni ekran</string>
     <string name="use_system_font">Koristi sistemski font</string>
+    <string name="system_font">Sistemski font</string>
+    <string name="use_plain_wallpaper">Koristi običnu pozadinu</string>
 </resources>

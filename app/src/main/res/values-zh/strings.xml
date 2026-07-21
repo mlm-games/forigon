@@ -133,4 +133,6 @@
     <string name="alignment_changed">对齐已更改 ✅</string>
     <string name="home_screen">主屏幕</string>
     <string name="use_system_font">使用系统字体</string>
+    <string name="system_font">系统字体</string>
+    <string name="use_plain_wallpaper">使用纯色壁纸</string>
 </resources>
