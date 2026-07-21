@@ -1,7 +1,5 @@
 name: Android App Releases
 on:
-  schedule:
-    - cron: '0 0 1 */2 *'
   workflow_dispatch:
     inputs:
       upload_releases:
